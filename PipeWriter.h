@@ -110,7 +110,7 @@ public:
             Data data = popqueue();
             // Sanity check
             // sanity(data.data);
-#if 1
+#if 0
             ssize_t nb = data.size;
 #else
             ssize_t nb = 0;
