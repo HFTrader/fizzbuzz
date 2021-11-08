@@ -10,19 +10,8 @@
 #include "MemUtils.h"
 #include "NumericUtils.h"
 #include "LapTimer.h"
-#include "Template.h"
 #include "Vanilla.h"
-
-template <unsigned NDIG>
-void print(char *&p, uint64_t value) {
-    char *s = p + NDIG - 1;
-    for (uint32_t j = 0; j < NDIG; ++j) {
-        *s-- = '0' + (value % 10);
-        value /= 10;
-    }
-    p += NDIG;
-    *p++ = '\n';
-}
+#include "Template.h"
 
 using Flag = std::atomic<uint32_t>;
 
@@ -41,21 +30,28 @@ struct Work {
 void generator(Work &work) {
     TemplateBank bank;
     uint64_t base = 1;
+    uint32_t accumulated = 0;
+    char *buffer = *work.buffer_ptr;
+    bank.fill(1, buffer);
     while (true) {
         // Wait for release
         // fprintf(stderr, "\tThread %d waiting...\n", work.idx);
         while (work.flag.load() == 0) __builtin_ia32_pause();
         // fprintf(stderr, "\tThread %d released...\n", work.idx);
         uint32_t nbytes = 0;
-        char *buffer = *work.buffer_ptr;
         char *ptr = buffer;
+        uint32_t numdigits = 1;
         while (ptr - buffer < work.bufsize - MAXBLOCKSIZE) {
             if ((base - 1) / 15 % work.nthreads == work.idx) {
-                ptr += bank.fill(base, ptr);
+                // generate block
+                ptr += bank.incfill(accumulated, ptr);
+                accumulated = 0;
+
             } else {
                 // skip block
                 ptr += calcBlockSize(base);
             }
+            accumulated += 15;
             base += 15;
         }
         // Notify
@@ -63,6 +59,7 @@ void generator(Work &work) {
         // fprintf(stderr, "\tThread %d done\n", work.idx);
     }
 }
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stdout, "Usage: fbthread <numthreads> \n");

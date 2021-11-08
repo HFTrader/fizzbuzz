@@ -9,21 +9,18 @@
 #include <iostream>
 
 /** Returns the CPU timestamp counter - for performance measurement only */
-static uint64_t ticks()
-{
+static uint64_t ticks() {
     return __builtin_ia32_rdtsc();
 }
 
-static uint64_t now()
-{
+static uint64_t now() {
     timespec tp;
     clock_gettime(CLOCK_REALTIME, &tp);
     return uint64_t(tp.tv_nsec) / 1000000 + uint64_t(tp.tv_sec) * 1000;
 }
 
 /** Computes throughput given number of bytes updates */
-class Chronometer
-{
+class Chronometer {
 private:
     uint64_t msecs_start = now();
     uint64_t msecs_lap = msecs_start;
@@ -35,11 +32,12 @@ private:
 
 public:
     /** Constructor is passed the timeout in ticks to print progress */
-    Chronometer(uint64_t tmout) : timeout(tmout) { reset(); }
+    Chronometer(uint64_t tmout) : timeout(tmout) {
+        reset();
+    }
 
     /** Initializes internal state */
-    void reset()
-    {
+    void reset() {
         msecs_start = now();
         msecs_lap = msecs_start;
         tstart = ticks();
@@ -49,13 +47,11 @@ public:
     }
 
     /** inputs updates on progress */
-    void lap(uint64_t nb)
-    {
+    void lap(uint64_t nb) {
         bytes += nb;
         bytes_lap += nb;
         uint64_t tnow = ticks();
-        if (tnow > tlap + timeout)
-        {
+        if (tnow > tlap + timeout) {
             uint64_t msecs_now = now();
             uint64_t delta_start = msecs_now - msecs_start;
             uint64_t delta_lap = msecs_now - msecs_lap;

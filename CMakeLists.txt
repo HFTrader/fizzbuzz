@@ -19,7 +19,12 @@ add_custom_command( TARGET fizzbuzz.vanilla
                     BYPRODUCTS golden.txt 
                     COMMAND fizzbuzz.vanilla > golden.txt )
 
-#add_executable( fbthread fbthread.cpp )
-#target_link_libraries( fbthread pthread )
+add_executable( fbthread fbthread.cpp )
+target_link_libraries( fbthread pthread )
+
+add_executable( fbinterleaved fbinterleaved.cpp )
+target_link_libraries( fbinterleaved pthread )
 
 add_executable( testread testread.cpp )
+add_executable( testpow10 testpow10.cpp )
+add_executable( testblocksize testblocksize.cpp )

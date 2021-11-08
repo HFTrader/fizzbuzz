@@ -12,26 +12,21 @@
 #include "MemUtils.h"
 
 #define TRY(cmd)             \
-    do                       \
-    {                        \
+    do {                     \
         int res = cmd;       \
-        if (res < 0)         \
-        {                    \
+        if (res < 0) {       \
             int err = errno; \
             perror(#cmd);    \
             return 1;        \
         }                    \
     } while (0);
 
-uint64_t now()
-{
+uint64_t now() {
     return __builtin_ia32_rdtsc();
 }
 
-int main(int argc, char *argv[])
-{
-    if (argc < 2)
-    {
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
         printf("Usage: throughput <pipesize> <delay>\n");
         return 0;
     }
@@ -40,14 +35,11 @@ int main(int argc, char *argv[])
     uint64_t delay = delaysecs * 3200000000ULL;
     uint32_t tosend = 1 * 1024 * 1024;
     char *buffer = (char *)vmalloc(tosend);
-    for (uint32_t count = 0, nb = 0; nb < tosend;)
-    {
+    for (uint32_t count = 0, nb = 0; nb < tosend;) {
         uint32_t left = tosend - nb;
         int32_t written = ::snprintf(&buffer[nb], left, "%d\n", ++count);
-        if (written > 0)
-        {
-            if (written == left)
-            {
+        if (written > 0) {
+            if (written == left) {
                 std::memset(&buffer[nb], '\n', written);
             }
             nb += written;
@@ -60,16 +52,13 @@ int main(int argc, char *argv[])
     uint32_t maxpipe = getmaxpipe();
 
     uint64_t nextts = now() + delay;
-    while (now() < nextts)
-    {
+    while (now() < nextts) {
         uint32_t nb = 0;
-        while (nb < tosend)
-        {
+        while (nb < tosend) {
             iovec iov;
             iov.iov_base = &buffer[nb];
             iov.iov_len = tosend - nb;
-            if (iov.iov_len > maxpipe)
-            {
+            if (iov.iov_len > maxpipe) {
                 iov.iov_len = maxpipe;
             }
             nb += ::vmsplice(fd, &iov, 1, 0);

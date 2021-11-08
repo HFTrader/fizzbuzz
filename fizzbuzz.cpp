@@ -7,10 +7,8 @@
 #include <memory>
 #include <vector>
 
-int main(int argc, char *argv[])
-{
-    if (argc != 3)
-    {
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
         printf("Usage: fizzbuzz.hb <numthreads> <numblocks> \n");
         return 0;
     }
@@ -23,8 +21,7 @@ int main(int argc, char *argv[])
     using GeneratorPtr = std::shared_ptr<Generator>;
     std::vector<GeneratorPtr> loops;
     PipeWriter writer(nthreads, bufsize);
-    for (uint32_t j = 0; j < nthreads; ++j)
-    {
+    for (uint32_t j = 0; j < nthreads; ++j) {
         GeneratorPtr loop(new Generator(writer, 1 + j * stride, numblocks, jump));
         loops.push_back(loop);
     }

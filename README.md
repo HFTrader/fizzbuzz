@@ -13,13 +13,15 @@ The current state of affairs is:
 
 3. I tried another approach in fbthread.cpp but that's not compiling so commented out in CMakeLists.txt
 
+4. fbinterleaved was a neat idea but it turns out cache contention makes it very slow. It's there for completeness.
 
 # Install
 
 Typical cmake build:
 
 ```bash
-make build
+mkdir build
+cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make 
 ```
